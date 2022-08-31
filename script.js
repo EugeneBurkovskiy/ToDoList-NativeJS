@@ -1,12 +1,12 @@
 document.addEventListener("DOMContentLoaded", () => {
 
     const input = document.getElementById('task'),
-        btn = document.querySelector('.list__button'),
+        add = document.querySelector('.list__button'),
         wrapper = document.querySelector(".item__wrapper"),
         select = document.querySelector(".list__select");
 
     let itemCounter = 1;
-    let activeTaskList = [],
+    let activeTaskList = Array.from(localStorage.getItem("active").split(",")),
         doneTaskList = [],
         deletedTaskList = [];
 
@@ -20,10 +20,18 @@ document.addEventListener("DOMContentLoaded", () => {
             `;
         return element;
     }
+    if (activeTaskList[0] == [""]) {
+        activeTaskList.shift();
+    }
 
-    btn.addEventListener('click', function () {
+    activeTaskList.forEach((item, i = 1) => {
+        wrapper.append(createElement(i, item));
+    });
+
+    add.addEventListener('click', function () {
         if (input.value && input.value != "Input your task please!") {
             activeTaskList.push(input.value);
+            localStorage.setItem("active", activeTaskList);
             wrapper.innerHTML = "";
             activeTaskList.forEach((item, i = 1) => {
                 wrapper.append(createElement(i, item));
@@ -35,9 +43,8 @@ document.addEventListener("DOMContentLoaded", () => {
             setTimeout(() => {
                 input.style.color = "black";
                 input.value = "";
-            }, 1000);
+            }, 300);
         }
-
     });
 
     function reloadList(arr) {
@@ -62,6 +69,11 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
+    function addTask() {
+        activeTaskList.forEach((item, i = 1) => {
+            wrapper.append(createElement(i, item));
+        });
+    }
 
     wrapper.addEventListener("click", (event) => {
         const del = document.querySelectorAll(".item__delete"),
@@ -72,20 +84,20 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (event.target == item) {
                     deletedTaskList.push(activeTaskList.splice(i, 1));
                 }
+                localStorage.setItem("active", activeTaskList);
+                localStorage.setItem("delete", deletedTaskList);
             });
-            activeTaskList.forEach((item, i = 1) => {
-                wrapper.append(createElement(i, item));
-            });
+            addTask();
         } else if (event.target && event.target.classList.contains("item__done")) {
             wrapper.innerHTML = "";
             done.forEach((item, i) => {
                 if (event.target == item) {
                     doneTaskList.push(activeTaskList.splice(i, 1));
                 }
+                localStorage.setItem("active", activeTaskList);
+                localStorage.setItem("done", doneTaskList);
             });
-            activeTaskList.forEach((item, i = 1) => {
-                wrapper.append(createElement(i, item));
-            });
+            addTask();
         }
     });
 
@@ -111,6 +123,7 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         }
     });
+
 
     // wrapper.addEventListener("mouseover", (e) => {
     //     if (e.target && e.target.classList.contains("item__task")) {

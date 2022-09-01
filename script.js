@@ -1,3 +1,4 @@
+'use strict';
 document.addEventListener("DOMContentLoaded", () => {
 
     const input = document.getElementById('task'),
@@ -5,10 +6,25 @@ document.addEventListener("DOMContentLoaded", () => {
         wrapper = document.querySelector(".item__wrapper"),
         select = document.querySelector(".list__select");
 
+    let activeTaskList, doneTaskList, deletedTaskList;
+
     let itemCounter = 1;
-    let activeTaskList = Array.from(localStorage.getItem("active").split(",")),
-        doneTaskList = [],
-        deletedTaskList = [];
+
+    function checkStorage(arr, name) {
+        if (localStorage.getItem(name) != null) {
+            arr = Array.from(localStorage.getItem(name).split(","));
+        } else {
+            localStorage.setItem(name, "");
+            arr = Array.from(localStorage.getItem(name).split(","));
+        }
+        if (arr[0] == "") {
+            arr.splice(0, 1);
+        }
+        return (arr);
+    }
+    activeTaskList = checkStorage(activeTaskList, "active");
+    doneTaskList = checkStorage(doneTaskList, "done");
+    deletedTaskList = checkStorage(deletedTaskList, "deleted");
 
     function createElement(counter, task) {
         const element = document.createElement('li');
@@ -20,22 +36,15 @@ document.addEventListener("DOMContentLoaded", () => {
             `;
         return element;
     }
-    if (activeTaskList[0] == [""]) {
-        activeTaskList.shift();
-    }
 
-    activeTaskList.forEach((item, i = 1) => {
-        wrapper.append(createElement(i, item));
-    });
+    addTask();
 
     add.addEventListener('click', function () {
         if (input.value && input.value != "Input your task please!") {
             activeTaskList.push(input.value);
             localStorage.setItem("active", activeTaskList);
             wrapper.innerHTML = "";
-            activeTaskList.forEach((item, i = 1) => {
-                wrapper.append(createElement(i, item));
-            });
+            addTask();
             input.value = "";
         } else {
             input.style.color = "red";
@@ -46,6 +55,12 @@ document.addEventListener("DOMContentLoaded", () => {
             }, 300);
         }
     });
+
+    function addTask() {
+        activeTaskList.forEach((item, i = 1) => {
+            wrapper.append(createElement(i, item));
+        });
+    }
 
     function reloadList(arr) {
         wrapper.innerHTML = "";
@@ -60,20 +75,20 @@ document.addEventListener("DOMContentLoaded", () => {
             reloadList(doneTaskList);
             wrapper.querySelectorAll("img").forEach(item => {
                 item.style.display = "none";
+                wrapper.querySelectorAll(".item__task").forEach(item => {
+                    item.querySelector("P").style.cssText = `color: rgb(6, 207, 6);`;
+                });
             });
         } else if (select.value == "Deleted") {
             reloadList(deletedTaskList);
             wrapper.querySelectorAll("img").forEach(item => {
                 item.style.display = "none";
             });
+            wrapper.querySelectorAll(".item__task").forEach(item => {
+                item.querySelector("P").style.cssText = `text-decoration: line-through;`;
+            });
         }
     });
-
-    function addTask() {
-        activeTaskList.forEach((item, i = 1) => {
-            wrapper.append(createElement(i, item));
-        });
-    }
 
     wrapper.addEventListener("click", (event) => {
         const del = document.querySelectorAll(".item__delete"),
@@ -85,7 +100,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     deletedTaskList.push(activeTaskList.splice(i, 1));
                 }
                 localStorage.setItem("active", activeTaskList);
-                localStorage.setItem("delete", deletedTaskList);
+                localStorage.setItem("deleted", deletedTaskList);
             });
             addTask();
         } else if (event.target && event.target.classList.contains("item__done")) {
@@ -124,20 +139,11 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-
-    // wrapper.addEventListener("mouseover", (e) => {
-    //     if (e.target && e.target.classList.contains("item__task")) {
-    //         wrapper.querySelectorAll(".item__task").forEach(item => {
-    //             if (e.target === item) {
-    //                 item.querySelector(".item__delete").classList.add("item__delete_hover");
-    //                 console.log(1);
-    //             }
-    //         });
-    //     } else {
-    //         wrapper.querySelectorAll(".item__task").forEach(item => {
-    //             item.querySelector(".item__delete").classList.remove("item__delete_hover");
-    //             console.log(1);
-    //         });
-    //     }
-    // });
+    document.querySelector(".list__clear").addEventListener("click", () => {
+        localStorage.clear();
+        activeTaskList = [];
+        doneTaskList = [];
+        deletedTaskList = [];
+        wrapper.innerHTML = "";
+    });
 });

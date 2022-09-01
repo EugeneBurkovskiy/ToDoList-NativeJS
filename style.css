@@ -204,7 +204,7 @@ select{
 }
 @media (min-width: 1201px){
     .container{
-        width: 80%;
+        width: 40%;
     }
 }
 @media (max-width: 1200px){

@@ -76,7 +76,7 @@ document.addEventListener("DOMContentLoaded", () => {
             wrapper.querySelectorAll("img").forEach(item => {
                 item.style.display = "none";
                 wrapper.querySelectorAll(".item__task").forEach(item => {
-                    item.querySelector("P").style.cssText = `color: rgb(6, 207, 6);`;
+                    item.style.cssText = `background : rgb(6, 207, 6);`;
                 });
             });
         } else if (select.value == "Deleted") {
@@ -127,14 +127,16 @@ document.addEventListener("DOMContentLoaded", () => {
         } else if (e.target && e.target.classList.contains("item__done")) {
             wrapper.querySelectorAll(".item__done").forEach((item, i) => {
                 if (e.target == item) {
-                    wrapper.querySelectorAll("P")[i].classList.add("item__word_done");
+                    // wrapper.querySelectorAll("P")[i].classList.add("item__word_done");
+                    wrapper.querySelectorAll(".item__task")[i].style.cssText = `background : rgb(6, 207, 6);`;
                 }
             });
         }
         else {
             wrapper.querySelectorAll(".item__delete").forEach((item, i) => {
                 wrapper.querySelectorAll("P")[i].classList.remove("item__word_del");
-                wrapper.querySelectorAll("P")[i].classList.remove("item__word_done");
+                wrapper.querySelectorAll(".item__task")[i].style.cssText = `background : relative`;
+                // wrapper.querySelectorAll("P")[i].classList.remove("item__word_done");
             });
         }
     });
